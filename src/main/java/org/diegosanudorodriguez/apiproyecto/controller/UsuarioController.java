@@ -1,5 +1,7 @@
 package org.diegosanudorodriguez.apiproyecto.controller;
 
+import org.diegosanudorodriguez.apiproyecto.dto.LoginRequest;
+import org.diegosanudorodriguez.apiproyecto.dto.LoginResponse;
 import org.diegosanudorodriguez.apiproyecto.model.Usuario;
 import org.diegosanudorodriguez.apiproyecto.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,6 @@ public class UsuarioController {
         return ResponseEntity.ok(updatedUsuario);
     }
 
-
     // Delete user
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUsuario(@PathVariable Integer id) {
@@ -78,5 +79,12 @@ public class UsuarioController {
         return usuarioRepository.findByEmail(email)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        return usuarioRepository.findByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword())
+                .map(usuario -> ResponseEntity.ok(LoginResponse.success(usuario.getIdUsuario(), usuario.getNombre())))
+                .orElse(ResponseEntity.ok(LoginResponse.failure()));
     }
 }
